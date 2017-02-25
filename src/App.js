@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import WeightForm from './WeightForm';
 
 class App extends Component {
   constructor() {
@@ -8,6 +9,7 @@ class App extends Component {
       search: '',
       selected: null,
       isFetching: true,
+
     }
   }
 
@@ -29,11 +31,15 @@ class App extends Component {
     const { data, search, selected, isFetching } = this.state
     if (isFetching) return <div>Loading...</div>
 
-    const filtered = data.filter(d => d['Main food description'].toLowerCase().includes(search))
+    const filtered = data.filter(d =>{
+      var main_desc = d['Main food description'].toLowerCase();
+      // var additional_desc = d['additional'].join('; ').toLowerCase();
+      return main_desc.includes(search)// || additional_desc.includes(search)
+    })
     const food = data.filter(d => d['Food code'] === selected)[0]
 
     return (
-      <div className='p3 container'>
+      <div className='p3'>
         <input
           className='mb2 field'
           type='text'
@@ -51,10 +57,13 @@ class App extends Component {
           <div className='sm-col sm-col-7 px1'>
             <table className='table-light bg-white border rounded'>
               <thead className='bg-darken-1'>
-                <tr><td>code</td><td>desc</td></tr>
+                <tr><td>code</td><td>desc</td><td>additional</td></tr>
               </thead>
               <tbody>
-                {filtered.slice(0, 25).map((d, i) => (
+                {filtered.slice(0, 25)
+                   .sort((a, b) => {
+                     return (a['Main food description'].toLowerCase().indexOf(search) >= b['Main food description'].toLowerCase().indexOf(search) ? 1 : -1)})
+                    .map((d, i) => (
                   <tr key={i}>
                     <td>
                       <a href='#!' onClick={this.pickFood}>{d['Food code']}</a>
@@ -62,28 +71,15 @@ class App extends Component {
                     <td>
                       {d['Main food description']}
                     </td>
+                    <td>
+                      {d['additional'].join(', ')}
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          {food &&
-            <div className='sm-col sm-col-5 px1'>
-              <table className='table-light bg-white border rounded'>
-                <thead className='bg-darken-1'>
-                  <tr><td>desc</td><td>weight</td></tr>
-                </thead>
-                <tbody>
-                  {food.portions.map((d, i) => (
-                    <tr key={i}>
-                      <td>{d.desc}</td>
-                      <td>{d.weight}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          }
+          {food && <WeightForm food={food}/> }
         </div>
       </div>
     )
