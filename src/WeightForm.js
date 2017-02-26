@@ -3,14 +3,24 @@ import React, { Component } from 'react'
 class WeightForm extends Component {
   constructor(props) {
     super(props)
-
     this.state = {
-      selectedWeight: Number(this.props.food.portions[0].weight),
-      selectedAmount: null,
-      totalWeight: null
+      selectedWeight:  props.food.portions[0].weight,
+      selectedAmount: 0,
+      totalWeight: 0
     }
     this.handleWeightChange = this.handleWeightChange.bind(this);
     this.handleAmountChange = this.handleAmountChange.bind(this);
+
+  }
+
+  componentWillReceiveProps(props){
+    this.setState({
+      selectedWeight: props.food.portions[0].weight,
+      selectedAmount: 0,
+      totalWeight: 0
+    })
+    console.log(props.food, this.state)
+
   }
 
   handleWeightChange(event) {
@@ -40,7 +50,7 @@ class WeightForm extends Component {
         <select className="block col-12 field" name="selectedWeight" onChange={this.handleWeightChange}>
         {
           food.portions.map((d, i) => (
-            <option value={Number(d.weight)}>{d.desc}</option>
+            <option key={i} value={Number(d.weight)}>{d.desc}</option>
           ))
         }
         </select>
@@ -49,7 +59,7 @@ class WeightForm extends Component {
         </form>
 
         <h2>Results</h2>
-        <table className="table-light"><thead className="bg-darken-1"><th>Food Code</th><th> Weight in Grams</th></thead>
+        <table className="table-light"><thead className="bg-darken-1"><tr><th>Food Code</th><th> Weight in Grams</th></tr></thead>
         <tbody><tr><td>{food["Food code"]}</td><td>{this.state.totalWeight}</td></tr></tbody>
         </table>
       </div>
